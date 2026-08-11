@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
+import { isProductImageUrl, sanitizeProductDescription } from "@/lib/sanitize";
 
 const PAGE_SIZE = 20;
 
@@ -31,6 +32,15 @@ export async function GET(request: Request) {
   }
 }
 
+// Product images must come from POST /api/admin/upload (Supabase Storage),
+// never a hand-typed URL — enforced here via isProductImageUrl, not just by
+// convention on the frontend.
+const productImageUrl = z
+  .string()
+  .trim()
+  .min(1)
+  .refine(isProductImageUrl, { message: "허용되지 않은 이미지 경로입니다" });
+
 const productSchema = z.object({
   brandKo: z.string().trim().min(1),
   brandEn: z.string().trim().optional(),
@@ -43,7 +53,8 @@ const productSchema = z.object({
   price: z.number().int().nonnegative(),
   descriptionKo: z.string().trim().optional(),
   descriptionEn: z.string().trim().optional(),
-  imageUrl: z.string().trim().optional(),
+  imageUrl: productImageUrl,
+  additionalImageUrls: z.array(productImageUrl).max(4).optional(),
   status: z.enum(["active", "soldout"]).optional(),
 });
 
@@ -65,17 +76,26 @@ export async function POST(request: Request) {
       .from("products")
       .insert({
         brand_ko: v.brandKo,
-        brand_en: v.brandEn ?? null,
+        // `|| null` (not `??`), so an explicitly-cleared "" is stored as
+        // null the same as an omitted field — both mean "no translation
+        // yet", and downstream display falls back to the Korean value via
+        // `p.brand_en ?? p.brand_ko`, which only fires on null/undefined.
+        brand_en: v.brandEn || null,
         name_ko: v.nameKo,
-        name_en: v.nameEn ?? null,
+        name_en: v.nameEn || null,
         size: v.size,
         weight_gsm: v.weightGsm,
         unit_ko: v.unitKo,
-        unit_en: v.unitEn ?? null,
+        unit_en: v.unitEn || null,
         price: v.price,
-        description_ko: v.descriptionKo ?? null,
-        description_en: v.descriptionEn ?? null,
-        image_url: v.imageUrl ?? null,
+        description_ko: v.descriptionKo
+          ? sanitizeProductDescription(v.descriptionKo)
+          : null,
+        description_en: v.descriptionEn
+          ? sanitizeProductDescription(v.descriptionEn)
+          : null,
+        image_url: v.imageUrl,
+        additional_image_urls: v.additionalImageUrls ?? [],
         status: v.status ?? "active",
       })
       .select()

@@ -47,3 +47,42 @@ body {
   background: var(--color-surface);
   color: var(--color-ink);
 }
+
+/*
+ * Tiptap (rich-text-editor.tsx) renders its own default `.tiptap` root
+ * class on the contentEditable element. These rules only cover what
+ * Tailwind's utility classes can't reach: the Placeholder extension's
+ * pseudo-element text and baseline list/image formatting for saved HTML
+ * (product description), which needs list markers and image sizing kept
+ * intact in both the editor and the read-only product detail page.
+ */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-ink-faint);
+  pointer-events: none;
+}
+
+.tiptap ul,
+.product-description ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.tiptap ol,
+.product-description ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.tiptap img,
+.product-description img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+}
+
+.tiptap p:not(:last-child),
+.product-description p:not(:last-child) {
+  margin-bottom: 0.5rem;
+}

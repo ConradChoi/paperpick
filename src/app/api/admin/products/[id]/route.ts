@@ -3,6 +3,15 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
+import { isProductImageUrl, sanitizeProductDescription } from "@/lib/sanitize";
+
+// Same allowlist as POST /api/admin/products — product images must come
+// from POST /api/admin/upload, never a hand-typed URL.
+const productImageUrl = z
+  .string()
+  .trim()
+  .min(1)
+  .refine(isProductImageUrl, { message: "허용되지 않은 이미지 경로입니다" });
 
 const productUpdateSchema = z.object({
   brandKo: z.string().trim().min(1).optional(),
@@ -16,9 +25,23 @@ const productUpdateSchema = z.object({
   price: z.number().int().nonnegative().optional(),
   descriptionKo: z.string().trim().optional(),
   descriptionEn: z.string().trim().optional(),
-  imageUrl: z.string().trim().optional(),
+  imageUrl: productImageUrl.optional(),
+  additionalImageUrls: z.array(productImageUrl).max(4).optional(),
   status: z.enum(["active", "soldout"]).optional(),
 });
+
+// Optional/translatable text fields where an explicitly-cleared "" must be
+// stored as null, not the literal empty string — otherwise the display
+// fallback (e.g. `p.brand_en ?? p.brand_ko`) never fires, since "" isn't
+// nullish, and English-locale pages would render blank instead of falling
+// back to the Korean value.
+const NULLABLE_TEXT_FIELDS = new Set([
+  "brandEn",
+  "nameEn",
+  "unitEn",
+  "descriptionKo",
+  "descriptionEn",
+]);
 
 const fieldMap: Record<string, string> = {
   brandKo: "brand_ko",
@@ -33,6 +56,7 @@ const fieldMap: Record<string, string> = {
   descriptionKo: "description_ko",
   descriptionEn: "description_en",
   imageUrl: "image_url",
+  additionalImageUrls: "additional_image_urls",
   status: "status",
 };
 
@@ -55,7 +79,14 @@ export async function PATCH(
 
     const update: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(parsed.data)) {
-      if (value !== undefined) update[fieldMap[key]] = value;
+      if (value === undefined) continue;
+      if (NULLABLE_TEXT_FIELDS.has(key) && value === "") {
+        update[fieldMap[key]] = null;
+      } else if (key === "descriptionKo" || key === "descriptionEn") {
+        update[fieldMap[key]] = sanitizeProductDescription(value as string);
+      } else {
+        update[fieldMap[key]] = value;
+      }
     }
 
     const { data, error } = await supabase

@@ -3,7 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FormField, TextAreaField } from "@/components/ui/form-field";
+import { FormField } from "@/components/ui/form-field";
+import { ImageUploadSlots, type ImageUploadValue } from "@/components/admin/image-upload-slots";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { Product } from "@/types/database";
 
 const SIZES = ["A4", "A3", "B4", "B5"];
@@ -13,25 +15,42 @@ export function ProductForm({ product }: { product?: Product }) {
   const isEdit = !!product;
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [images, setImages] = useState<ImageUploadValue>({
+    thumbnailUrl: product?.image_url ?? null,
+    additionalUrls: product?.additional_image_urls ?? [],
+  });
+  const [descriptionKo, setDescriptionKo] = useState(product?.description_ko ?? "");
+  const [descriptionEn, setDescriptionEn] = useState(product?.description_en ?? "");
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    if (!images.thumbnailUrl) {
+      setError("대표 이미지를 등록해주세요");
+      return;
+    }
+
     setSubmitting(true);
 
     const form = new FormData(e.currentTarget);
     const payload = {
       brandKo: form.get("brandKo"),
-      brandEn: form.get("brandEn") || undefined,
+      // Always send the field, even "" — the API normalizes "" to null.
+      // Swallowing "" into `undefined` here would make PATCH treat an
+      // intentionally-cleared field as "no change" and keep the old value.
+      brandEn: form.get("brandEn") ?? "",
       nameKo: form.get("nameKo"),
-      nameEn: form.get("nameEn") || undefined,
+      nameEn: form.get("nameEn") ?? "",
       size: form.get("size"),
       weightGsm: Number(form.get("weightGsm")),
       unitKo: form.get("unitKo"),
-      unitEn: form.get("unitEn") || undefined,
+      unitEn: form.get("unitEn") ?? "",
       price: Number(form.get("price")),
-      descriptionKo: form.get("descriptionKo") || undefined,
-      descriptionEn: form.get("descriptionEn") || undefined,
+      descriptionKo,
+      descriptionEn,
+      imageUrl: images.thumbnailUrl,
+      additionalImageUrls: images.additionalUrls,
       status: form.get("status"),
     };
 
@@ -55,6 +74,11 @@ export function ProductForm({ product }: { product?: Product }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-2xl flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <span className="text-[13px] font-medium text-ink">상품 이미지</span>
+        <ImageUploadSlots value={images} onChange={setImages} />
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <FormField
           label="브랜드 (한글)"
@@ -129,16 +153,22 @@ export function ProductForm({ product }: { product?: Product }) {
         />
       </div>
 
-      <TextAreaField
-        label="상세설명 (한글)"
-        name="descriptionKo"
-        defaultValue={product?.description_ko ?? ""}
-      />
-      <TextAreaField
-        label="상세설명 (영문)"
-        name="descriptionEn"
-        defaultValue={product?.description_en ?? ""}
-      />
+      <div className="flex flex-col gap-2">
+        <label className="text-[13px] font-medium text-ink">상세설명 (한글)</label>
+        <RichTextEditor
+          value={product?.description_ko}
+          onChange={setDescriptionKo}
+          placeholder="상세설명을 입력해주세요"
+        />
+      </div>
+      <div className="flex flex-col gap-2">
+        <label className="text-[13px] font-medium text-ink">상세설명 (영문)</label>
+        <RichTextEditor
+          value={product?.description_en}
+          onChange={setDescriptionEn}
+          placeholder="Enter a description"
+        />
+      </div>
 
       <div className="flex flex-col gap-2">
         <label className="text-[13px] font-medium text-ink">판매 상태</label>

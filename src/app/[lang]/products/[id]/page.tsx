@@ -3,6 +3,7 @@ import { getDictionary, hasLocale } from "../../dictionaries";
 import { fetchProduct, fetchProducts } from "@/lib/data/products";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
+import { ProductGallery } from "@/components/product-gallery";
 
 export default async function ProductDetailPage({
   params,
@@ -27,18 +28,11 @@ export default async function ProductDetailPage({
   return (
     <div className="flex flex-col">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-8 lg:flex-row">
-        <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-line bg-surface-muted text-sm text-ink-faint lg:w-1/2">
-          {product.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="h-full w-full rounded-lg object-cover"
-            />
-          ) : (
-            dict.productCard.imagePlaceholder
-          )}
-        </div>
+        <ProductGallery
+          images={product.images}
+          alt={product.name}
+          placeholder={dict.productCard.imagePlaceholder}
+        />
         <div className="flex flex-col gap-4 lg:w-1/2">
           <span className="text-sm text-ink-muted">{product.brand}</span>
           <h1 className="text-2xl font-bold text-ink sm:text-3xl">
@@ -69,9 +63,10 @@ export default async function ProductDetailPage({
           <h2 className="mb-4 text-xl font-bold text-ink">
             {dict.productDetail.detailsTitle}
           </h2>
-          <p className="text-sm leading-relaxed text-ink-muted">
-            {product.description}
-          </p>
+          <div
+            className="product-description text-sm leading-relaxed text-ink-muted"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
         </div>
       )}
 

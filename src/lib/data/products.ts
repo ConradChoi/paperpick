@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/types/database";
 import type { ProductSummary } from "@/components/product-card";
+import { sanitizeProductDescription, looksLikeHtml, escapePlainTextAsHtml } from "@/lib/sanitize";
 
 const PAGE_SIZE = 12;
 
@@ -60,6 +61,10 @@ export type ProductDetail = {
   price: number;
   description: string | null;
   imageUrl: string | null;
+  // Representative image (imageUrl) followed by additional_image_urls, in
+  // order, with empty/falsy entries filtered out. imageUrl, when present,
+  // is always index 0.
+  images: string[];
   status: string;
 };
 
@@ -79,6 +84,9 @@ export async function fetchProduct(
   if (!data) return null;
 
   const p = data as Product;
+  const rawDescription =
+    locale === "en" ? (p.description_en ?? p.description_ko) : p.description_ko;
+
   return {
     id: p.id,
     brand: locale === "en" ? (p.brand_en ?? p.brand_ko) : p.brand_ko,
@@ -87,9 +95,21 @@ export async function fetchProduct(
     weightGsm: p.weight_gsm,
     unit: locale === "en" ? (p.unit_en ?? p.unit_ko) : p.unit_ko,
     price: p.price,
-    description:
-      locale === "en" ? (p.description_en ?? p.description_ko) : p.description_ko,
+    // Re-sanitized here even though it's sanitized on write — defense in
+    // depth against rows written before this allowlist existed or edited
+    // directly in the DB, since this is what the public page renders.
+    // Rows written before the rich-text editor existed are plain text, not
+    // HTML — those must never be run through sanitizeHtml (see looksLikeHtml
+    // for why) and are instead escaped + line-break-converted directly.
+    description: rawDescription
+      ? looksLikeHtml(rawDescription)
+        ? sanitizeProductDescription(rawDescription)
+        : escapePlainTextAsHtml(rawDescription)
+      : null,
     imageUrl: p.image_url,
+    images: [p.image_url, ...(p.additional_image_urls ?? [])].filter(
+      (url): url is string => !!url,
+    ),
     status: p.status,
   };
 }
