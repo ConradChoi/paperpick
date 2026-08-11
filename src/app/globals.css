@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/*
+ * Token names are the bare color name only (no bg-/text-/border- prefix) —
+ * Tailwind v4 derives bg-, text-, border- and ring- utilities from each
+ * --color- variable automatically. Prefixing the token itself (e.g.
+ * --color-border-brand) would produce a stuttering class like
+ * `border-border-brand`.
+ */
+@theme inline {
+  --font-sans: var(--font-pretendard);
+
+  /* Brand */
+  --color-brand: #2f6fed;
+  --color-brand-hover: #1d54c6;
+  --color-brand-tint: #ebf2fe;
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8f9fa;
+  --color-surface-inverse: #212529;
+
+  /* Text */
+  --color-ink: #212529;
+  --color-ink-muted: #868e96;
+  --color-ink-faint: #adb5bd;
+  --color-ink-inverse: #ffffff;
+
+  /* Borders */
+  --color-line: #e9ecef;
+  --color-line-strong: #ced4da;
+
+  /* State */
+  --color-success: #2f9e44;
+  --color-success-tint: #e6f6ea;
+  --color-error: #e03131;
+  --color-error-tint: #fdeaea;
+  --color-warning: #f08c00;
+  --color-warning-tint: #fdf1e0;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}

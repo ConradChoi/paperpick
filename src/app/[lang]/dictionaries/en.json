@@ -1,0 +1,77 @@
+{
+  "common": {
+    "logo": "Paper Pick",
+    "home": "Home",
+    "products": "Products",
+    "contact": "Contact",
+    "inquire": "Inquire",
+    "langSwitch": "KR / EN"
+  },
+  "footer": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "companyInfo": "Paper Pick · CEO: 000 · Business Reg. No.: 000-00-00000 · Mail Order License No.: 0000-Seoul00-00000\nAddress: 00, 00-ro, 00-gu, 00-si · Email: hello@paperpick.co.kr",
+    "copyright": "© 2026 Paper Pick. All rights reserved."
+  },
+  "landing": {
+    "heroTitle": "Trusted A4 Copy Paper,\nPaper Pick",
+    "heroSubtitle": "Easy for overseas customers and\nforeign residents in Korea.",
+    "browseProducts": "Browse Products",
+    "whyTitle": "Why Paper Pick?",
+    "features": [
+      { "title": "✓ Trusted Brands", "desc": "We only carry trusted brands like Double A, Hansol, and PaperOne." },
+      { "title": "✓ Multilingual Support", "desc": "Korean · English — for overseas customers and foreign residents." },
+      { "title": "✓ Fast Response", "desc": "Leave an inquiry or reservation and we'll get back to you quickly." }
+    ],
+    "popularProducts": "Popular Products",
+    "viewAll": "View All Products →",
+    "ctaTitle": "Inquire Now and Be the First to Know",
+    "ctaButton": "Inquire / Reserve"
+  },
+  "productCard": {
+    "imagePlaceholder": "Product Image",
+    "inquire": "Inquire"
+  },
+  "productList": {
+    "title": "All Products",
+    "filterBrand": "All Brands",
+    "filterSize": "All Sizes",
+    "filterWeight": "All Weights"
+  },
+  "productDetail": {
+    "detailsTitle": "Product Details",
+    "relatedTitle": "You Might Also Like",
+    "size": "Size",
+    "weight": "Weight",
+    "contents": "Contents",
+    "origin": "Origin",
+    "originValue": "South Korea",
+    "inquireReserve": "Inquire / Reserve"
+  },
+  "inquiryForm": {
+    "title": "Inquiry · Reservation",
+    "subtitle": "Leave your details and our team will get back to you quickly.",
+    "subtitleDesktop": "Leave your details and our team will get back to you quickly. International shipping inquiries are welcome.",
+    "selectedProduct": "Selected product",
+    "typeLabel": "Inquiry Type",
+    "typeGeneral": "General Inquiry",
+    "typeReservation": "Reservation",
+    "typeNewsletter": "Newsletter",
+    "nameLabel": "Name",
+    "namePlaceholder": "John Doe",
+    "contactLabel": "Phone or Email",
+    "contactPlaceholder": "+82 10-0000-0000 or email@example.com",
+    "messageLabel": "Message (optional)",
+    "messagePlaceholder": "Feel free to share any details here",
+    "consentLabel": "[Required] I agree to the collection and use of my personal information.",
+    "policyLine": "Collected: name, phone/email · Retention: 1 year after processing · See Privacy Policy for details",
+    "submit": "Submit",
+    "trust1": "✓ Response within 1 business day",
+    "trust2": "✓ Your data is securely deleted after processing",
+    "trust3": "✓ Bulk orders & recurring supply available",
+    "successTitle": "Submitted successfully",
+    "successBody": "Our team will contact you shortly.",
+    "errorConsent": "Please agree to the collection and use of your personal information",
+    "errorGeneric": "Something went wrong. Please try again."
+  }
+}
