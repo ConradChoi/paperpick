@@ -55,7 +55,12 @@ export default async function AdminProductsPage() {
                 <td className="px-4 py-3 text-ink-muted">
                   {p.size} · {p.weight_gsm}g
                 </td>
-                <td className="px-4 py-3 text-ink">₩{p.price.toLocaleString()}</td>
+                <td className="px-4 py-3 text-ink">
+                  <div className="flex items-center gap-2">
+                    ₩{p.price.toLocaleString()}
+                    {!p.price_visible && <Badge style="neutral">비공개</Badge>}
+                  </div>
+                </td>
                 <td className="px-4 py-3">
                   <Badge style={p.status === "active" ? "success" : "neutral"}>
                     {p.status === "active" ? "판매중" : "품절"}

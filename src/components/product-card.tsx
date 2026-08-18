@@ -7,6 +7,7 @@ export type ProductSummary = {
   name: string;
   spec: string;
   price: number;
+  priceVisible: boolean;
   imageUrl: string | null;
 };
 
@@ -14,11 +15,13 @@ export function ProductCard({
   product,
   lang,
   imagePlaceholder,
+  priceOnRequestLabel,
   inquireLabel,
 }: {
   product: ProductSummary;
   lang: Locale;
   imagePlaceholder: string;
+  priceOnRequestLabel: string;
   inquireLabel: string;
 }) {
   return (
@@ -44,7 +47,9 @@ export function ProductCard({
           <span className="font-semibold text-ink">{product.name}</span>
           <span className="text-[13px] text-ink-muted">{product.spec}</span>
           <span className="text-lg font-bold text-ink">
-            ₩{product.price.toLocaleString()}
+            {product.priceVisible
+              ? `₩${product.price.toLocaleString()}`
+              : priceOnRequestLabel}
           </span>
         </Link>
         <Link

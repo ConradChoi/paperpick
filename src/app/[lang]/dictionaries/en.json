@@ -30,6 +30,7 @@
   },
   "productCard": {
     "imagePlaceholder": "Product Image",
+    "priceOnRequest": "Contact for price",
     "inquire": "Inquire"
   },
   "productList": {

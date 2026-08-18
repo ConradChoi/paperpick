@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { ImageUploadSlots, type ImageUploadValue } from "@/components/admin/image-upload-slots";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -21,6 +22,7 @@ export function ProductForm({ product }: { product?: Product }) {
   });
   const [descriptionKo, setDescriptionKo] = useState(product?.description_ko ?? "");
   const [descriptionEn, setDescriptionEn] = useState(product?.description_en ?? "");
+  const [priceVisible, setPriceVisible] = useState(product?.price_visible ?? true);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,6 +49,7 @@ export function ProductForm({ product }: { product?: Product }) {
       unitKo: form.get("unitKo"),
       unitEn: form.get("unitEn") ?? "",
       price: Number(form.get("price")),
+      priceVisible,
       descriptionKo,
       descriptionEn,
       imageUrl: images.thumbnailUrl,
@@ -136,6 +139,13 @@ export function ProductForm({ product }: { product?: Product }) {
           required
         />
       </div>
+
+      <Checkbox
+        name="priceVisible"
+        label="User 화면에 가격 노출 (해제 시 '가격문의'로 표시)"
+        checked={priceVisible}
+        onChange={(e) => setPriceVisible(e.target.checked)}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <FormField

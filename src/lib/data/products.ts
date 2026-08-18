@@ -59,6 +59,7 @@ export type ProductDetail = {
   weightGsm: number;
   unit: string;
   price: number;
+  priceVisible: boolean;
   description: string | null;
   imageUrl: string | null;
   // Representative image (imageUrl) followed by additional_image_urls, in
@@ -95,6 +96,7 @@ export async function fetchProduct(
     weightGsm: p.weight_gsm,
     unit: locale === "en" ? (p.unit_en ?? p.unit_ko) : p.unit_ko,
     price: p.price,
+    priceVisible: p.price_visible,
     // Re-sanitized here even though it's sanitized on write — defense in
     // depth against rows written before this allowlist existed or edited
     // directly in the DB, since this is what the public page renders.
@@ -121,6 +123,7 @@ function toSummary(p: Product, locale: Locale): ProductSummary {
     name: locale === "en" ? (p.name_en ?? p.name_ko) : p.name_ko,
     spec: `${p.size} · ${p.weight_gsm}g · ${locale === "en" ? (p.unit_en ?? p.unit_ko) : p.unit_ko}`,
     price: p.price,
+    priceVisible: p.price_visible,
     imageUrl: p.image_url,
   };
 }

@@ -12,6 +12,7 @@ export type Product = {
   unit_ko: string;
   unit_en: string | null;
   price: number;
+  price_visible: boolean;
   description_ko: string | null;
   description_en: string | null;
   image_url: string | null;

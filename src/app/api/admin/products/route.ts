@@ -51,6 +51,7 @@ const productSchema = z.object({
   unitKo: z.string().trim().min(1),
   unitEn: z.string().trim().optional(),
   price: z.number().int().nonnegative(),
+  priceVisible: z.boolean().optional(),
   descriptionKo: z.string().trim().optional(),
   descriptionEn: z.string().trim().optional(),
   imageUrl: productImageUrl,
@@ -88,6 +89,7 @@ export async function POST(request: Request) {
         unit_ko: v.unitKo,
         unit_en: v.unitEn || null,
         price: v.price,
+        price_visible: v.priceVisible ?? true,
         description_ko: v.descriptionKo
           ? sanitizeProductDescription(v.descriptionKo)
           : null,

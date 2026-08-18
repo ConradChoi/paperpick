@@ -47,6 +47,7 @@ export default async function ProductListPage({
               product={product}
               lang={lang}
               imagePlaceholder={dict.productCard.imagePlaceholder}
+              priceOnRequestLabel={dict.productCard.priceOnRequest}
               inquireLabel={dict.productCard.inquire}
             />
           ))}

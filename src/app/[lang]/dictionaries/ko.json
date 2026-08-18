@@ -30,6 +30,7 @@
   },
   "productCard": {
     "imagePlaceholder": "상품 이미지",
+    "priceOnRequest": "가격문의",
     "inquire": "문의하기"
   },
   "productList": {

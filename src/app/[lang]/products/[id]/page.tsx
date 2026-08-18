@@ -39,7 +39,9 @@ export default async function ProductDetailPage({
             {product.name}
           </h1>
           <p className="text-2xl font-bold text-ink">
-            ₩{product.price.toLocaleString()}
+            {product.priceVisible
+              ? `₩${product.price.toLocaleString()}`
+              : dict.productCard.priceOnRequest}
           </p>
           <dl className="flex flex-col gap-2 rounded-lg bg-surface-muted p-4">
             {specs.map(([label, value]) => (
@@ -83,6 +85,7 @@ export default async function ProductDetailPage({
                   product={p}
                   lang={lang}
                   imagePlaceholder={dict.productCard.imagePlaceholder}
+                  priceOnRequestLabel={dict.productCard.priceOnRequest}
                   inquireLabel={dict.productCard.inquire}
                 />
               ))}
