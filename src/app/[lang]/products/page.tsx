@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale } from "../dictionaries";
-import { fetchProducts } from "@/lib/data/products";
+import { fetchOptionGroups, fetchProducts } from "@/lib/data/products";
 import { ProductCard } from "@/components/product-card";
 import { ProductFilters } from "@/components/product-filters";
 
@@ -19,7 +19,20 @@ export default async function ProductListPage({
   const weight = typeof sp.weight === "string" ? Number(sp.weight) : null;
   const page = typeof sp.page === "string" ? Math.max(1, Number(sp.page) || 1) : 1;
 
-  const result = await fetchProducts({ brand, size, weight, locale: lang, page });
+  const optionGroups = await fetchOptionGroups(lang);
+  // Query param key must match ProductFilters' optionParamKey (`og_<groupId>`).
+  const optionValueIds = optionGroups
+    .map((group) => sp[`og_${group.id}`])
+    .filter((v): v is string => typeof v === "string");
+
+  const result = await fetchProducts({
+    brand,
+    size,
+    weight,
+    optionValueIds,
+    locale: lang,
+    page,
+  });
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-8">
@@ -33,6 +46,7 @@ export default async function ProductListPage({
           size: dict.productList.filterSize,
           weight: dict.productList.filterWeight,
         }}
+        optionGroups={optionGroups}
       />
 
       {result.data.length === 0 ? (
@@ -62,6 +76,10 @@ export default async function ProductListPage({
               if (brand) params.set("brand", brand);
               if (size) params.set("size", size);
               if (weight) params.set("weight", String(weight));
+              for (const group of optionGroups) {
+                const v = sp[`og_${group.id}`];
+                if (typeof v === "string") params.set(`og_${group.id}`, v);
+              }
               if (p > 1) params.set("page", String(p));
               const qs = params.toString();
               return (

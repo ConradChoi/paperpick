@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale } from "../../dictionaries";
 import { fetchProduct, fetchProducts } from "@/lib/data/products";
-import { ButtonLink } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductGallery } from "@/components/product-gallery";
+import { ProductOptions } from "@/components/product-options";
 
 export default async function ProductDetailPage({
   params,
@@ -38,11 +38,6 @@ export default async function ProductDetailPage({
           <h1 className="text-2xl font-bold text-ink sm:text-3xl">
             {product.name}
           </h1>
-          <p className="text-2xl font-bold text-ink">
-            {product.priceVisible
-              ? `₩${product.price.toLocaleString()}`
-              : dict.productCard.priceOnRequest}
-          </p>
           <dl className="flex flex-col gap-2 rounded-lg bg-surface-muted p-4">
             {specs.map(([label, value]) => (
               <div key={label} className="flex justify-between text-[13px]">
@@ -51,12 +46,15 @@ export default async function ProductDetailPage({
               </div>
             ))}
           </dl>
-          <ButtonLink
-            href={`/${lang}/inquiry?productId=${product.id}`}
-            size="lg"
-          >
-            {dict.productDetail.inquireReserve}
-          </ButtonLink>
+          <ProductOptions
+            lang={lang}
+            productId={product.id}
+            basePrice={product.price}
+            priceVisible={product.priceVisible}
+            priceOnRequestLabel={dict.productCard.priceOnRequest}
+            optionGroups={product.optionGroups}
+            inquireLabel={dict.productDetail.inquireReserve}
+          />
         </div>
       </div>
 

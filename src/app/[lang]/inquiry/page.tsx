@@ -14,6 +14,7 @@ export default async function InquiryPage({
   const sp = await searchParams;
   const productId = typeof sp.productId === "string" ? sp.productId : undefined;
   const product = productId ? await fetchProduct(productId, lang) : null;
+  const optionSummary = typeof sp.option === "string" ? sp.option : undefined;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 sm:px-8">
@@ -31,6 +32,11 @@ export default async function InquiryPage({
         productId={product?.id}
         productName={product?.name}
         defaultType={product ? "reservation" : "general"}
+        defaultMessage={
+          optionSummary
+            ? `${dict.inquiryForm.selectedOption}: ${optionSummary}`
+            : undefined
+        }
       />
     </div>
   );

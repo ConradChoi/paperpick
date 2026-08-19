@@ -22,6 +22,27 @@ export type Product = {
   updated_at: string;
 };
 
+export type OptionType = "display" | "variant";
+
+export type OptionGroup = {
+  id: string;
+  name_ko: string;
+  name_en: string | null;
+  type: OptionType;
+  sort_order: number;
+  created_at: string;
+};
+
+export type OptionValue = {
+  id: string;
+  option_group_id: string;
+  value_ko: string;
+  value_en: string | null;
+  price_delta: number;
+  sort_order: number;
+  created_at: string;
+};
+
 export type InquiryType = "general" | "reservation" | "newsletter";
 export type InquiryStatus = "new" | "in_progress" | "done";
 export type Locale = "ko" | "en";

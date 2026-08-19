@@ -10,11 +10,13 @@ export async function GET(request: Request) {
     const weight = searchParams.get("weight");
     const locale = searchParams.get("locale") === "en" ? "en" : "ko";
     const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
+    const optionValueIds = searchParams.getAll("option");
 
     const result = await fetchProducts({
       brand,
       size,
       weight: weight ? Number(weight) : null,
+      optionValueIds: optionValueIds.length > 0 ? optionValueIds : null,
       locale,
       page,
     });

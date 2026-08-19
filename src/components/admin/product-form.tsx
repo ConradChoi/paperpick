@@ -7,11 +7,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { ImageUploadSlots, type ImageUploadValue } from "@/components/admin/image-upload-slots";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import type { Product } from "@/types/database";
+import type { OptionGroup, OptionValue, Product } from "@/types/database";
 
 const SIZES = ["A4", "A3", "B4", "B5"];
 
-export function ProductForm({ product }: { product?: Product }) {
+type OptionGroupWithValues = OptionGroup & { option_values: OptionValue[] };
+
+export function ProductForm({
+  product,
+  optionGroups = [],
+  selectedOptionValueIds = [],
+}: {
+  product?: Product;
+  optionGroups?: OptionGroupWithValues[];
+  selectedOptionValueIds?: string[];
+}) {
   const router = useRouter();
   const isEdit = !!product;
   const [submitting, setSubmitting] = useState(false);
@@ -23,6 +33,18 @@ export function ProductForm({ product }: { product?: Product }) {
   const [descriptionKo, setDescriptionKo] = useState(product?.description_ko ?? "");
   const [descriptionEn, setDescriptionEn] = useState(product?.description_en ?? "");
   const [priceVisible, setPriceVisible] = useState(product?.price_visible ?? true);
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(
+    new Set(selectedOptionValueIds),
+  );
+
+  function toggleOption(valueId: string) {
+    setSelectedOptions((prev) => {
+      const next = new Set(prev);
+      if (next.has(valueId)) next.delete(valueId);
+      else next.add(valueId);
+      return next;
+    });
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +77,7 @@ export function ProductForm({ product }: { product?: Product }) {
       imageUrl: images.thumbnailUrl,
       additionalImageUrls: images.additionalUrls,
       status: form.get("status"),
+      optionValueIds: Array.from(selectedOptions),
     };
 
     const url = isEdit ? `/api/admin/products/${product!.id}` : "/api/admin/products";
@@ -146,6 +169,55 @@ export function ProductForm({ product }: { product?: Product }) {
         checked={priceVisible}
         onChange={(e) => setPriceVisible(e.target.checked)}
       />
+
+      {optionGroups.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-[13px] font-medium text-ink">옵션</span>
+          {optionGroups.map((group) => (
+            <div
+              key={group.id}
+              className="flex flex-col gap-2 rounded-md border border-line p-3"
+            >
+              <span className="text-sm font-medium text-ink">
+                {group.name_ko}
+                {group.type === "variant" && (
+                  <span className="ml-2 text-xs font-normal text-ink-muted">
+                    (선택 시 가격에 차액 반영)
+                  </span>
+                )}
+              </span>
+              {group.option_values.length === 0 ? (
+                <p className="text-xs text-ink-faint">
+                  등록된 값이 없습니다. 옵션 관리에서 값을 먼저 추가해주세요.
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {group.option_values.map((value) => (
+                    <label
+                      key={value.id}
+                      className="flex cursor-pointer items-center gap-1.5 text-[13px] text-ink"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedOptions.has(value.id)}
+                        onChange={() => toggleOption(value.id)}
+                        className="h-4 w-4 rounded border-line text-brand accent-brand"
+                      />
+                      {value.value_ko}
+                      {group.type === "variant" && value.price_delta !== 0 && (
+                        <span className="text-xs text-ink-muted">
+                          ({value.price_delta > 0 ? "+" : ""}
+                          {value.price_delta.toLocaleString()}원)
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <FormField

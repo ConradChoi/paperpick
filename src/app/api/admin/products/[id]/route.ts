@@ -29,6 +29,7 @@ const productUpdateSchema = z.object({
   imageUrl: productImageUrl.optional(),
   additionalImageUrls: z.array(productImageUrl).max(4).optional(),
   status: z.enum(["active", "soldout"]).optional(),
+  optionValueIds: z.array(z.string().uuid()).optional(),
 });
 
 // Optional/translatable text fields where an explicitly-cleared "" must be
@@ -79,8 +80,12 @@ export async function PATCH(
       );
     }
 
+    // Not a `products` column — synced separately against
+    // product_option_values below, not through the fieldMap loop.
+    const { optionValueIds, ...productFields } = parsed.data;
+
     const update: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(parsed.data)) {
+    for (const [key, value] of Object.entries(productFields)) {
       if (value === undefined) continue;
       if (NULLABLE_TEXT_FIELDS.has(key) && value === "") {
         update[fieldMap[key]] = null;
@@ -91,16 +96,52 @@ export async function PATCH(
       }
     }
 
-    const { data, error } = await supabase
-      .from("products")
-      .update(update)
-      .eq("id", id)
-      .select()
-      .maybeSingle();
+    let data = null;
+    if (Object.keys(update).length > 0) {
+      const result = await supabase
+        .from("products")
+        .update(update)
+        .eq("id", id)
+        .select()
+        .maybeSingle();
+      if (result.error) throw result.error;
+      data = result.data;
+      if (!data) {
+        throw new ApiError(404, "PRODUCT_NOT_FOUND", "상품을 찾을 수 없습니다");
+      }
+    }
 
-    if (error) throw error;
+    if (optionValueIds !== undefined) {
+      const { error: deleteError } = await supabase
+        .from("product_option_values")
+        .delete()
+        .eq("product_id", id);
+      if (deleteError) throw deleteError;
+
+      if (optionValueIds.length > 0) {
+        const { error: insertError } = await supabase
+          .from("product_option_values")
+          .insert(
+            optionValueIds.map((optionValueId) => ({
+              product_id: id,
+              option_value_id: optionValueId,
+            })),
+          );
+        if (insertError) throw insertError;
+      }
+    }
+
     if (!data) {
-      throw new ApiError(404, "PRODUCT_NOT_FOUND", "상품을 찾을 수 없습니다");
+      const result = await supabase
+        .from("products")
+        .select()
+        .eq("id", id)
+        .maybeSingle();
+      if (result.error) throw result.error;
+      if (!result.data) {
+        throw new ApiError(404, "PRODUCT_NOT_FOUND", "상품을 찾을 수 없습니다");
+      }
+      data = result.data;
     }
 
     return NextResponse.json({ data });
