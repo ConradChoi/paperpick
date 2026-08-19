@@ -7,20 +7,27 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { ImageUploadSlots, type ImageUploadValue } from "@/components/admin/image-upload-slots";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import type { OptionGroup, OptionValue, Product } from "@/types/database";
+import type { Product } from "@/types/database";
 
 const SIZES = ["A4", "A3", "B4", "B5"];
 
-type OptionGroupWithValues = OptionGroup & { option_values: OptionValue[] };
+export type SelectableProduct = {
+  id: string;
+  brand_ko: string;
+  name_ko: string;
+  price: number;
+};
 
 export function ProductForm({
   product,
-  optionGroups = [],
-  selectedOptionValueIds = [],
+  availableProducts = [],
+  selectedOptionProductIds = [],
 }: {
   product?: Product;
-  optionGroups?: OptionGroupWithValues[];
-  selectedOptionValueIds?: string[];
+  // Every other existing product, selectable as an "option" of this one —
+  // see product-option-switcher.tsx for how the User side renders them.
+  availableProducts?: SelectableProduct[];
+  selectedOptionProductIds?: string[];
 }) {
   const router = useRouter();
   const isEdit = !!product;
@@ -34,14 +41,14 @@ export function ProductForm({
   const [descriptionEn, setDescriptionEn] = useState(product?.description_en ?? "");
   const [priceVisible, setPriceVisible] = useState(product?.price_visible ?? true);
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(
-    new Set(selectedOptionValueIds),
+    new Set(selectedOptionProductIds),
   );
 
-  function toggleOption(valueId: string) {
+  function toggleOption(productId: string) {
     setSelectedOptions((prev) => {
       const next = new Set(prev);
-      if (next.has(valueId)) next.delete(valueId);
-      else next.add(valueId);
+      if (next.has(productId)) next.delete(productId);
+      else next.add(productId);
       return next;
     });
   }
@@ -77,7 +84,7 @@ export function ProductForm({
       imageUrl: images.thumbnailUrl,
       additionalImageUrls: images.additionalUrls,
       status: form.get("status"),
-      optionValueIds: Array.from(selectedOptions),
+      optionProductIds: Array.from(selectedOptions),
     };
 
     const url = isEdit ? `/api/admin/products/${product!.id}` : "/api/admin/products";
@@ -170,52 +177,35 @@ export function ProductForm({
         onChange={(e) => setPriceVisible(e.target.checked)}
       />
 
-      {optionGroups.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <span className="text-[13px] font-medium text-ink">옵션</span>
-          {optionGroups.map((group) => (
-            <div
-              key={group.id}
-              className="flex flex-col gap-2 rounded-md border border-line p-3"
-            >
-              <span className="text-sm font-medium text-ink">
-                {group.name_ko}
-                {group.type === "variant" && (
-                  <span className="ml-2 text-xs font-normal text-ink-muted">
-                    (선택 시 가격에 차액 반영)
-                  </span>
-                )}
-              </span>
-              {group.option_values.length === 0 ? (
-                <p className="text-xs text-ink-faint">
-                  등록된 값이 없습니다. 옵션 관리에서 값을 먼저 추가해주세요.
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-3">
-                  {group.option_values.map((value) => (
-                    <label
-                      key={value.id}
-                      className="flex cursor-pointer items-center gap-1.5 text-[13px] text-ink"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedOptions.has(value.id)}
-                        onChange={() => toggleOption(value.id)}
-                        className="h-4 w-4 rounded border-line text-brand accent-brand"
-                      />
-                      {value.value_ko}
-                      {group.type === "variant" && value.price_delta !== 0 && (
-                        <span className="text-xs text-ink-muted">
-                          ({value.price_delta > 0 ? "+" : ""}
-                          {value.price_delta.toLocaleString()}원)
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+      {availableProducts.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[13px] font-medium text-ink">
+            옵션으로 연결할 상품
+          </span>
+          <p className="text-xs text-ink-faint">
+            체크한 상품은 이 상품의 상세페이지에서 옵션 버튼으로 표시되며,
+            선택 시 가격·이미지·설명이 해당 상품 값으로 즉시 바뀝니다.
+          </p>
+          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto rounded-md border border-line p-3">
+            {availableProducts.map((p) => (
+              <label
+                key={p.id}
+                className="flex cursor-pointer items-center gap-2 text-[13px] text-ink"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedOptions.has(p.id)}
+                  onChange={() => toggleOption(p.id)}
+                  className="h-4 w-4 rounded border-line text-brand accent-brand"
+                />
+                <span className="text-ink-muted">{p.brand_ko}</span>
+                {p.name_ko}
+                <span className="text-xs text-ink-muted">
+                  ₩{p.price.toLocaleString()}
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
       )}
 

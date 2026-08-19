@@ -2,7 +2,6 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { Locale } from "@/app/[lang]/dictionaries";
-import type { ProductOptionGroupView } from "@/lib/data/products";
 
 const BRANDS: Record<Locale, string[]> = {
   ko: ["더블에이", "한솔카피", "페이퍼원"],
@@ -11,20 +10,12 @@ const BRANDS: Record<Locale, string[]> = {
 const SIZES = ["A4", "A3", "B4", "B5"];
 const WEIGHTS = [70, 75, 80];
 
-// Query param key for a given option group's filter dropdown — namespaced
-// by group id so multiple groups' selections don't collide.
-function optionParamKey(groupId: string) {
-  return `og_${groupId}`;
-}
-
 export function ProductFilters({
   lang,
   labels,
-  optionGroups = [],
 }: {
   lang: Locale;
   labels: { brand: string; size: string; weight: string };
-  optionGroups?: ProductOptionGroupView[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -82,23 +73,6 @@ export function ProductFilters({
           </option>
         ))}
       </select>
-      {optionGroups.map((group) => (
-        <select
-          key={group.id}
-          className={selectClass}
-          value={searchParams.get(optionParamKey(group.id)) ?? ""}
-          onChange={(e) => updateFilter(optionParamKey(group.id), e.target.value)}
-        >
-          <option value="">
-            {lang === "en" ? `All ${group.name}` : `${group.name} 전체`}
-          </option>
-          {group.values.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.value}
-            </option>
-          ))}
-        </select>
-      ))}
     </div>
   );
 }

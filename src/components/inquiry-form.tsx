@@ -40,14 +40,12 @@ export function InquiryForm({
   productId,
   productName,
   defaultType = "general",
-  defaultMessage,
 }: {
   lang: Locale;
   dict: Dict;
   productId?: string;
   productName?: string;
   defaultType?: InquiryType;
-  defaultMessage?: string;
 }) {
   const [type, setType] = useState<InquiryType>(defaultType);
   const [submitting, setSubmitting] = useState(false);
@@ -155,7 +153,6 @@ export function InquiryForm({
         label={dict.messageLabel}
         name="message"
         placeholder={dict.messagePlaceholder}
-        defaultValue={defaultMessage}
       />
 
       <div className="flex flex-col gap-1">

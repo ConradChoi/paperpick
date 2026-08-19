@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { getDictionary, hasLocale } from "../../dictionaries";
 import { fetchProduct, fetchProducts } from "@/lib/data/products";
 import { ProductCard } from "@/components/product-card";
-import { ProductGallery } from "@/components/product-gallery";
-import { ProductOptions } from "@/components/product-options";
+import { ProductOptionSwitcher } from "@/components/product-option-switcher";
 
 export default async function ProductDetailPage({
   params,
@@ -18,57 +17,23 @@ export default async function ProductDetailPage({
   const related = await fetchProducts({ locale: lang, page: 1 });
   const relatedProducts = related.data.filter((p) => p.id !== id).slice(0, 3);
 
-  const specs: [string, string][] = [
-    [dict.productDetail.size, `${product.size} (210×297mm)`],
-    [dict.productDetail.weight, `${product.weightGsm}g/m²`],
-    [dict.productDetail.contents, product.unit],
-    [dict.productDetail.origin, dict.productDetail.originValue],
-  ];
-
   return (
     <div className="flex flex-col">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 sm:px-8 lg:flex-row">
-        <ProductGallery
-          images={product.images}
-          alt={product.name}
-          placeholder={dict.productCard.imagePlaceholder}
-        />
-        <div className="flex flex-col gap-4 lg:w-1/2">
-          <span className="text-sm text-ink-muted">{product.brand}</span>
-          <h1 className="text-2xl font-bold text-ink sm:text-3xl">
-            {product.name}
-          </h1>
-          <dl className="flex flex-col gap-2 rounded-lg bg-surface-muted p-4">
-            {specs.map(([label, value]) => (
-              <div key={label} className="flex justify-between text-[13px]">
-                <dt className="text-ink-muted">{label}</dt>
-                <dd className="font-semibold text-ink">{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <ProductOptions
-            lang={lang}
-            productId={product.id}
-            basePrice={product.price}
-            priceVisible={product.priceVisible}
-            priceOnRequestLabel={dict.productCard.priceOnRequest}
-            optionGroups={product.optionGroups}
-            inquireLabel={dict.productDetail.inquireReserve}
-          />
-        </div>
-      </div>
-
-      {product.description && (
-        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8">
-          <h2 className="mb-4 text-xl font-bold text-ink">
-            {dict.productDetail.detailsTitle}
-          </h2>
-          <div
-            className="product-description text-sm leading-relaxed text-ink-muted"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
-        </div>
-      )}
+      <ProductOptionSwitcher
+        lang={lang}
+        options={product.options}
+        imagePlaceholder={dict.productCard.imagePlaceholder}
+        priceOnRequestLabel={dict.productCard.priceOnRequest}
+        inquireLabel={dict.productDetail.inquireReserve}
+        detailsTitle={dict.productDetail.detailsTitle}
+        specLabels={{
+          size: dict.productDetail.size,
+          weight: dict.productDetail.weight,
+          contents: dict.productDetail.contents,
+          origin: dict.productDetail.origin,
+          originValue: dict.productDetail.originValue,
+        }}
+      />
 
       {relatedProducts.length > 0 && (
         <div className="bg-surface-muted px-4 py-8 sm:px-8">

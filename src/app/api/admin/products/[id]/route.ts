@@ -29,7 +29,7 @@ const productUpdateSchema = z.object({
   imageUrl: productImageUrl.optional(),
   additionalImageUrls: z.array(productImageUrl).max(4).optional(),
   status: z.enum(["active", "soldout"]).optional(),
-  optionValueIds: z.array(z.string().uuid()).optional(),
+  optionProductIds: z.array(z.string().uuid()).optional(),
 });
 
 // Optional/translatable text fields where an explicitly-cleared "" must be
@@ -81,8 +81,8 @@ export async function PATCH(
     }
 
     // Not a `products` column — synced separately against
-    // product_option_values below, not through the fieldMap loop.
-    const { optionValueIds, ...productFields } = parsed.data;
+    // product_option_links below, not through the fieldMap loop.
+    const { optionProductIds, ...productFields } = parsed.data;
 
     const update: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(productFields)) {
@@ -111,20 +111,20 @@ export async function PATCH(
       }
     }
 
-    if (optionValueIds !== undefined) {
+    if (optionProductIds !== undefined) {
       const { error: deleteError } = await supabase
-        .from("product_option_values")
+        .from("product_option_links")
         .delete()
         .eq("product_id", id);
       if (deleteError) throw deleteError;
 
-      if (optionValueIds.length > 0) {
+      if (optionProductIds.length > 0) {
         const { error: insertError } = await supabase
-          .from("product_option_values")
+          .from("product_option_links")
           .insert(
-            optionValueIds.map((optionValueId) => ({
+            optionProductIds.map((optionProductId) => ({
               product_id: id,
-              option_value_id: optionValueId,
+              option_product_id: optionProductId,
             })),
           );
         if (insertError) throw insertError;

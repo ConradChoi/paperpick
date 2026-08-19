@@ -57,7 +57,7 @@ const productSchema = z.object({
   imageUrl: productImageUrl,
   additionalImageUrls: z.array(productImageUrl).max(4).optional(),
   status: z.enum(["active", "soldout"]).optional(),
-  optionValueIds: z.array(z.string().uuid()).optional(),
+  optionProductIds: z.array(z.string().uuid()).optional(),
 });
 
 export async function POST(request: Request) {
@@ -106,13 +106,13 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    if (v.optionValueIds?.length) {
+    if (v.optionProductIds?.length) {
       const { error: optionsError } = await supabase
-        .from("product_option_values")
+        .from("product_option_links")
         .insert(
-          v.optionValueIds.map((optionValueId) => ({
+          v.optionProductIds.map((optionProductId) => ({
             product_id: data.id,
-            option_value_id: optionValueId,
+            option_product_id: optionProductId,
           })),
         );
       if (optionsError) throw optionsError;
