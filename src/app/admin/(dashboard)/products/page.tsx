@@ -3,6 +3,7 @@ import { requireAdminPage } from "@/lib/auth/require-admin-page";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
+import { DuplicateProductButton } from "@/components/admin/duplicate-product-button";
 import type { Product } from "@/types/database";
 
 // See src/app/admin/(dashboard)/inquiries/page.tsx for why this is needed —
@@ -74,6 +75,7 @@ export default async function AdminProductsPage() {
                     >
                       수정
                     </Link>
+                    <DuplicateProductButton id={p.id} />
                     <DeleteProductButton id={p.id} name={p.name_ko} />
                   </div>
                 </td>
