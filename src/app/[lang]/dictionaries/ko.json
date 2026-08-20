@@ -1,10 +1,10 @@
 {
   "common": {
     "logo": "Paper Pick",
-    "home": "홈",
-    "products": "상품",
-    "contact": "문의",
-    "inquire": "문의하기",
+    "navProducts": "A4 복사용지",
+    "navBrand": "브랜드",
+    "navBulk": "대량구매 안내",
+    "navInquire": "문의하기",
     "langSwitch": "KR / EN"
   },
   "footer": {
@@ -14,9 +14,24 @@
     "copyright": "© 2026 Paper Pick. All rights reserved."
   },
   "landing": {
-    "heroTitle": "믿고 고르는\nA4 복사용지",
+    "heroTitleLine1": "믿고 고르는",
+    "heroTitleLine2": "A4 복사용지",
     "heroSubtitle": "검증된 브랜드의 A4 복사용지를\nPaper Pick에서 만나보세요.",
-    "browseProducts": "상품 보러가기",
+    "browseProducts": "A4 용지 보러가기 →",
+    "heroBulkInquire": "대량구매 문의",
+    "heroSpecs": {
+      "size": "A4",
+      "sizeDetail": "210 × 297 mm",
+      "weight": "75g / 80g",
+      "weightDetail": "다양한 평량",
+      "category": "COPY PAPER",
+      "categoryDetail": "For Daily Use"
+    },
+    "heroFeatures": [
+      { "title": "검증된 브랜드", "desc": "엄선한 브랜드만 소개" },
+      { "title": "한국어 · English 지원", "desc": "해외 고객도 편하게" },
+      { "title": "빠른 문의 응대", "desc": "친절하고 신속한 상담" }
+    ],
     "whyTitle": "왜 페이퍼 픽인가요?",
     "features": [
       { "title": "✓ 검증된 브랜드", "desc": "더블에이, 한솔, 페이퍼원 등 신뢰할 수 있는 브랜드만 취급합니다" },

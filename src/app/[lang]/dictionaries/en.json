@@ -1,10 +1,10 @@
 {
   "common": {
     "logo": "Paper Pick",
-    "home": "Home",
-    "products": "Products",
-    "contact": "Contact",
-    "inquire": "Inquire",
+    "navProducts": "A4 Copy Paper",
+    "navBrand": "Brands",
+    "navBulk": "Bulk Orders",
+    "navInquire": "Inquire",
     "langSwitch": "KR / EN"
   },
   "footer": {
@@ -14,9 +14,24 @@
     "copyright": "© 2026 Paper Pick. All rights reserved."
   },
   "landing": {
-    "heroTitle": "Trusted A4 Copy Paper,\nPaper Pick",
-    "heroSubtitle": "Easy for overseas customers and\nforeign residents in Korea.",
-    "browseProducts": "Browse Products",
+    "heroTitleLine1": "Trusted Choice for",
+    "heroTitleLine2": "A4 Copy Paper",
+    "heroSubtitle": "Explore A4 copy paper from\nverified brands on Paper Pick.",
+    "browseProducts": "Browse A4 Paper →",
+    "heroBulkInquire": "Bulk Purchase Inquiry",
+    "heroSpecs": {
+      "size": "A4",
+      "sizeDetail": "210 × 297 mm",
+      "weight": "75g / 80g",
+      "weightDetail": "Various weights",
+      "category": "COPY PAPER",
+      "categoryDetail": "For Daily Use"
+    },
+    "heroFeatures": [
+      { "title": "Trusted Brands", "desc": "Curated brands only" },
+      { "title": "Korean · English Support", "desc": "Easy for overseas customers" },
+      { "title": "Fast Response", "desc": "Friendly, prompt support" }
+    ],
     "whyTitle": "Why Paper Pick?",
     "features": [
       { "title": "✓ Trusted Brands", "desc": "We only carry trusted brands like Double A, Hansol, and PaperOne." },

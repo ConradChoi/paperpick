@@ -1,8 +1,17 @@
 import { getDictionary, hasLocale } from "./dictionaries";
 import { notFound } from "next/navigation";
+import {
+  Globe,
+  Headset,
+  Image as ImageIcon,
+  MessageCircle,
+  ShieldCheck,
+} from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCard, type ProductSummary } from "@/components/product-card";
 import { fetchProducts } from "@/lib/data/products";
+
+const HERO_FEATURE_ICONS = [ShieldCheck, Globe, Headset];
 
 export default async function LandingPage({
   params,
@@ -24,20 +33,83 @@ export default async function LandingPage({
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="bg-brand px-4 py-16 text-center sm:px-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 lg:flex-row lg:justify-between lg:text-left">
-          <div className="flex max-w-xl flex-col items-center gap-4 lg:items-start">
-            <h1 className="whitespace-pre-line text-3xl font-bold text-white sm:text-4xl">
-              {dict.landing.heroTitle}
+      <section className="bg-surface px-4 py-16 sm:px-8">
+        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:text-left">
+          <div className="flex max-w-xl flex-col items-center gap-6 lg:items-start">
+            <h1 className="text-4xl leading-tight font-extrabold sm:text-5xl">
+              <span className="text-ink">{dict.landing.heroTitleLine1}</span>
+              <br />
+              <span className="text-brand">{dict.landing.heroTitleLine2}</span>
             </h1>
-            <p className="whitespace-pre-line text-white/85">
+            <p className="whitespace-pre-line text-ink-muted">
               {dict.landing.heroSubtitle}
             </p>
-            <ButtonLink href={`/${lang}/products`} variant="secondary" size="lg">
-              {dict.landing.browseProducts}
-            </ButtonLink>
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <ButtonLink href={`/${lang}/products`} size="lg">
+                {dict.landing.browseProducts}
+              </ButtonLink>
+              <ButtonLink
+                href={`/${lang}/inquiry`}
+                variant="secondary"
+                size="lg"
+                className="inline-flex items-center gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                {dict.landing.heroBulkInquire}
+              </ButtonLink>
+            </div>
+
+            <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-4 lg:justify-start">
+              {dict.landing.heroFeatures.map((feature, index) => {
+                const Icon = HERO_FEATURE_ICONS[index];
+                return (
+                  <div key={feature.title} className="flex items-center gap-2">
+                    <Icon className="h-5 w-5 shrink-0 text-brand" />
+                    <div className="text-left">
+                      <p className="text-[13px] font-semibold text-ink">
+                        {feature.title}
+                      </p>
+                      <p className="text-xs text-ink-muted">{feature.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="hidden aspect-4/3 w-full max-w-md rounded-lg bg-white/10 lg:block" />
+
+          <div className="hidden items-stretch gap-6 lg:flex">
+            <div className="flex aspect-square w-72 items-center justify-center rounded-2xl bg-surface-muted text-ink-faint xl:w-80">
+              <ImageIcon className="h-16 w-16" />
+            </div>
+            <div className="flex flex-col justify-center gap-4 text-left">
+              <div>
+                <p className="text-lg font-bold text-ink">
+                  {dict.landing.heroSpecs.size}
+                </p>
+                <p className="text-xs text-ink-muted">
+                  {dict.landing.heroSpecs.sizeDetail}
+                </p>
+              </div>
+              <div className="h-px w-10 bg-line" />
+              <div>
+                <p className="text-lg font-bold text-ink">
+                  {dict.landing.heroSpecs.weight}
+                </p>
+                <p className="text-xs text-ink-muted">
+                  {dict.landing.heroSpecs.weightDetail}
+                </p>
+              </div>
+              <div className="h-px w-10 bg-line" />
+              <div>
+                <p className="text-sm font-bold text-ink">
+                  {dict.landing.heroSpecs.category}
+                </p>
+                <p className="text-xs text-ink-muted">
+                  {dict.landing.heroSpecs.categoryDetail}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
