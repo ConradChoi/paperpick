@@ -5,7 +5,9 @@ import { ButtonLink } from "@/components/ui/button";
 import { ProductCard, type ProductSummary } from "@/components/product-card";
 import { fetchProducts } from "@/lib/data/products";
 
-const HERO_FEATURE_ICONS = [ShieldCheck, Globe, Headset];
+// Same icon set used for both the Hero's compact feature row and the
+// "왜 페이퍼 픽인가요" section below, for a consistent visual language.
+const FEATURE_ICONS = [ShieldCheck, Globe, Headset];
 
 export default async function LandingPage({
   params,
@@ -55,7 +57,7 @@ export default async function LandingPage({
 
             <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-4 lg:justify-start">
               {dict.landing.heroFeatures.map((feature, index) => {
-                const Icon = HERO_FEATURE_ICONS[index];
+                const Icon = FEATURE_ICONS[index];
                 return (
                   <div key={feature.title} className="flex items-center gap-2">
                     <Icon className="h-5 w-5 shrink-0 text-brand" />
@@ -118,15 +120,21 @@ export default async function LandingPage({
           {dict.landing.whyTitle}
         </h2>
         <div className="grid w-full gap-6 sm:grid-cols-3">
-          {dict.landing.features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-2xl bg-surface-muted p-6"
-            >
-              <p className="font-semibold text-ink">{feature.title}</p>
-              <p className="mt-1 text-sm text-ink-muted">{feature.desc}</p>
-            </div>
-          ))}
+          {dict.landing.features.map((feature, index) => {
+            const Icon = FEATURE_ICONS[index];
+            return (
+              <div
+                key={feature.title}
+                className="flex flex-col items-start gap-3 rounded-2xl bg-surface-muted p-6"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-tint">
+                  <Icon className="h-5 w-5 text-brand" />
+                </div>
+                <p className="font-semibold text-ink">{feature.title}</p>
+                <p className="text-sm text-ink-muted">{feature.desc}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 

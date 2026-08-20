@@ -35,9 +35,9 @@
     ],
     "whyTitle": "Why Paper Pick?",
     "features": [
-      { "title": "✓ Trusted Brands", "desc": "We only carry trusted brands like Double A, Hansol, and PaperOne." },
-      { "title": "✓ Multilingual Support", "desc": "Korean · English — for overseas customers and foreign residents." },
-      { "title": "✓ Fast Response", "desc": "Leave an inquiry or reservation and we'll get back to you quickly." }
+      { "title": "Trusted Brands", "desc": "We only carry trusted brands like Double A, Hansol, and PaperOne." },
+      { "title": "Multilingual Support", "desc": "Korean · English — for overseas customers and foreign residents." },
+      { "title": "Fast Response", "desc": "Leave an inquiry or reservation and we'll get back to you quickly." }
     ],
     "popularProducts": "Popular Products",
     "viewAll": "View All Products →",
