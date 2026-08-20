@@ -5,8 +5,6 @@ import { ButtonLink } from "@/components/ui/button";
 import { ProductCard, type ProductSummary } from "@/components/product-card";
 import { fetchProducts } from "@/lib/data/products";
 
-// Same icon set used for both the Hero's compact feature row and the
-// "왜 페이퍼 픽인가요" section below, for a consistent visual language.
 const FEATURE_ICONS = [ShieldCheck, Globe, Headset];
 
 export default async function LandingPage({
@@ -53,23 +51,6 @@ export default async function LandingPage({
                 <MessageCircle className="h-4 w-4" />
                 {dict.landing.heroBulkInquire}
               </ButtonLink>
-            </div>
-
-            <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-4 lg:justify-start">
-              {dict.landing.heroFeatures.map((feature, index) => {
-                const Icon = FEATURE_ICONS[index];
-                return (
-                  <div key={feature.title} className="flex items-center gap-2">
-                    <Icon className="h-5 w-5 shrink-0 text-brand" />
-                    <div className="text-left">
-                      <p className="text-[13px] font-semibold text-ink">
-                        {feature.title}
-                      </p>
-                      <p className="text-xs text-ink-muted">{feature.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
 

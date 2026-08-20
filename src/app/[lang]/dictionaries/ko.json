@@ -28,11 +28,6 @@
       "category": "COPY PAPER",
       "categoryDetail": "For Daily Use"
     },
-    "heroFeatures": [
-      { "title": "검증된 브랜드", "desc": "엄선한 브랜드만 소개" },
-      { "title": "한국어 · English 지원", "desc": "해외 고객도 편하게" },
-      { "title": "빠른 문의 응대", "desc": "친절하고 신속한 상담" }
-    ],
     "whyTitle": "왜 페이퍼 픽인가요?",
     "features": [
       { "title": "검증된 브랜드", "desc": "더블에이, 한솔, 페이퍼원 등 신뢰할 수 있는 브랜드만 취급합니다" },
