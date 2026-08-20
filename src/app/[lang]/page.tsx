@@ -1,12 +1,6 @@
 import { getDictionary, hasLocale } from "./dictionaries";
 import { notFound } from "next/navigation";
-import {
-  Globe,
-  Headset,
-  Image as ImageIcon,
-  MessageCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { Globe, Headset, MessageCircle, ShieldCheck } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button";
 import { ProductCard, type ProductSummary } from "@/components/product-card";
 import { fetchProducts } from "@/lib/data/products";
@@ -78,8 +72,13 @@ export default async function LandingPage({
           </div>
 
           <div className="hidden items-stretch gap-6 lg:flex">
-            <div className="flex aspect-square w-72 items-center justify-center rounded-2xl bg-surface-muted text-ink-faint xl:w-80">
-              <ImageIcon className="h-16 w-16" />
+            <div className="aspect-square w-72 overflow-hidden rounded-2xl bg-surface-muted xl:w-80">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/hero-paper-stack.jpg"
+                alt={dict.landing.heroImageAlt}
+                className="h-full w-full object-cover"
+              />
             </div>
             <div className="flex flex-col justify-center gap-4 text-left">
               <div>
