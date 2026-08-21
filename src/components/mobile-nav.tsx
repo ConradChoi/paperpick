@@ -8,7 +8,6 @@ import { LangSwitcher } from "@/components/lang-switcher";
 
 type NavLabels = {
   navProducts: string;
-  navBrand: string;
   navBulk: string;
   navInquire: string;
 };
@@ -46,9 +45,6 @@ export function MobileNav({
         <nav className="absolute inset-x-0 top-full flex flex-col gap-4 border-b border-line bg-surface px-4 py-4 text-sm text-ink-muted shadow-sm">
           <Link href={`/${lang}/products`} className="hover:text-ink" onClick={() => setOpen(false)}>
             {labels.navProducts}
-          </Link>
-          <Link href={`/${lang}/products`} className="hover:text-ink" onClick={() => setOpen(false)}>
-            {labels.navBrand}
           </Link>
           <Link href={`/${lang}/inquiry`} className="hover:text-ink" onClick={() => setOpen(false)}>
             {labels.navBulk}

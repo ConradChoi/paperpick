@@ -20,9 +20,6 @@ export async function Header({ lang }: { lang: Locale }) {
           <Link href={`/${lang}/products`} className="hover:text-ink">
             {dict.common.navProducts}
           </Link>
-          <Link href={`/${lang}/products`} className="hover:text-ink">
-            {dict.common.navBrand}
-          </Link>
           <Link href={`/${lang}/inquiry`} className="hover:text-ink">
             {dict.common.navBulk}
           </Link>

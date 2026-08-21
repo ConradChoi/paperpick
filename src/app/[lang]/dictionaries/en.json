@@ -1,8 +1,7 @@
 {
   "common": {
     "logo": "Paper Pick",
-    "navProducts": "A4 Copy Paper",
-    "navBrand": "Brands",
+    "navProducts": "Products",
     "navBulk": "Bulk Orders",
     "navInquire": "Inquire",
     "langSwitch": "KR / EN"

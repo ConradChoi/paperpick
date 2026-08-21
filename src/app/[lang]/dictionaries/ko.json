@@ -1,8 +1,7 @@
 {
   "common": {
     "logo": "Paper Pick",
-    "navProducts": "A4 복사용지",
-    "navBrand": "브랜드",
+    "navProducts": "상품",
     "navBulk": "대량구매 안내",
     "navInquire": "문의하기",
     "langSwitch": "KR / EN"
