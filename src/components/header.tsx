@@ -8,7 +8,7 @@ export async function Header({ lang }: { lang: Locale }) {
   const dict = await getDictionary(lang);
 
   return (
-    <header className="relative border-b border-line bg-surface">
+    <header className="sticky top-0 z-40 border-b border-line bg-surface">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-8">
         <Link
           href={`/${lang}`}
