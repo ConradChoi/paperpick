@@ -32,7 +32,7 @@ export async function requireAdminPage() {
 // already hides the link, but that's cosmetic, not a boundary).
 export async function requireMenuAccess(menu: AdminMenu) {
   const { supabase, user } = await requireAdminPage();
-  const access = await getAdminAccess(user.id);
+  const access = await getAdminAccess(supabase, user.id);
 
   if (!access.can(menu, "read")) {
     redirect("/admin");
@@ -46,7 +46,7 @@ export async function requireMenuAccess(menu: AdminMenu) {
 // group permission.
 export async function requireSuperAdminPage() {
   const { supabase, user } = await requireAdminPage();
-  const access = await getAdminAccess(user.id);
+  const access = await getAdminAccess(supabase, user.id);
 
   if (!access.isSuperAdmin) {
     redirect("/admin");

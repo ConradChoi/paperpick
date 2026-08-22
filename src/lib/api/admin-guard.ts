@@ -43,7 +43,7 @@ export async function requireAdminPermission(
   actions: PermissionAction | PermissionAction[],
 ) {
   const { supabase, user } = await requireAdmin();
-  const access = await getAdminAccess(user.id);
+  const access = await getAdminAccess(supabase, user.id);
 
   const required = Array.isArray(actions) ? actions : [actions];
   if (!required.some((action) => access.can(menu, action))) {
@@ -58,7 +58,7 @@ export async function requireAdminPermission(
 // would let an operator grant themselves more access.
 export async function requireSuperAdmin() {
   const { supabase, user } = await requireAdmin();
-  const access = await getAdminAccess(user.id);
+  const access = await getAdminAccess(supabase, user.id);
 
   if (!access.isSuperAdmin) {
     throw new ApiError(403, "FORBIDDEN", "최고관리자만 사용할 수 있습니다");

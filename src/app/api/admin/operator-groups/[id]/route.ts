@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireSuperAdmin } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 const MENUS = ["products", "inquiries"] as const;
 
@@ -25,8 +24,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/operator-groups/[id]">,
 ) {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase: admin } = await requireSuperAdmin();
     const { id } = await ctx.params;
     const body = await parseJsonBody(request);
     const parsed = groupUpdateSchema.safeParse(body);
@@ -92,8 +90,7 @@ export async function DELETE(
   ctx: RouteContext<"/api/admin/operator-groups/[id]">,
 ) {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase: admin } = await requireSuperAdmin();
     const { id } = await ctx.params;
 
     // Operators in this group become group-less (on delete set null on

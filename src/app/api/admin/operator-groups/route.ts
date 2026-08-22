@@ -3,7 +3,6 @@ import { z } from "zod";
 import { requireSuperAdmin } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 const MENUS = ["products", "inquiries"] as const;
 
@@ -22,10 +21,9 @@ const groupSchema = z.object({
 
 export async function GET() {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase } = await requireSuperAdmin();
 
-    const { data, error } = await admin
+    const { data, error } = await supabase
       .from("operator_groups")
       .select("*, operator_group_permissions(*)")
       .order("created_at", { ascending: true });
@@ -39,8 +37,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase } = await requireSuperAdmin();
     const body = await parseJsonBody(request);
     const parsed = groupSchema.safeParse(body);
     if (!parsed.success) {
@@ -52,7 +49,7 @@ export async function POST(request: Request) {
     }
     const v = parsed.data;
 
-    const { data: group, error: groupError } = await admin
+    const { data: group, error: groupError } = await supabase
       .from("operator_groups")
       .insert({ name: v.name })
       .select()
@@ -60,7 +57,7 @@ export async function POST(request: Request) {
     if (groupError) throw groupError;
 
     if (v.permissions?.length) {
-      const { error: permError } = await admin
+      const { error: permError } = await supabase
         .from("operator_group_permissions")
         .insert(
           v.permissions.map((p) => ({

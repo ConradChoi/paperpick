@@ -1,13 +1,11 @@
 import { requireSuperAdminPage } from "@/lib/auth/require-admin-page";
 import { OperatorForm } from "@/components/admin/operator-form";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { OperatorGroup } from "@/types/database";
 
 export default async function NewOperatorPage() {
-  await requireSuperAdminPage();
-  const admin = createAdminClient();
+  const { supabase } = await requireSuperAdminPage();
 
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from("operator_groups")
     .select("*")
     .order("name", { ascending: true });

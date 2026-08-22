@@ -14,8 +14,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/operators/[id]">,
 ) {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase: admin } = await requireSuperAdmin();
     const { id } = await ctx.params;
     const body = await parseJsonBody(request);
     const parsed = operatorUpdateSchema.safeParse(body);

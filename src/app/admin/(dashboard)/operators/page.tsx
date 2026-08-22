@@ -3,7 +3,6 @@ import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OperatorGroupSelect } from "@/components/admin/operator-group-select";
 import { DeleteOperatorButton } from "@/components/admin/delete-operator-button";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { OperatorGroup } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -18,8 +17,7 @@ type OperatorRow = {
 };
 
 export default async function OperatorsPage() {
-  const { user: caller } = await requireSuperAdminPage();
-  const admin = createAdminClient();
+  const { supabase: admin, user: caller } = await requireSuperAdminPage();
 
   const [operatorsResult, groupsResult] = await Promise.all([
     admin

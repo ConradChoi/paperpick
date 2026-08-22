@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AdminMenu, PermissionAction } from "@/types/database";
 
 export type AdminAccess = {
@@ -21,16 +21,18 @@ const ACTION_COLUMN: Record<PermissionAction, string> = {
 };
 
 // Resolves what the given (already-authenticated, already is_admin()-gated)
-// user is allowed to do. Uses the service-role client rather than the
-// caller's cookie-bound one: operator_group_permissions is RLS-locked to
-// super admins only (see 20260822010000_operator_permissions.sql) since
-// operators must never read/write permission data, including their own —
-// this lookup runs with elevated trust *after* the caller has already
-// cleared the base admin check.
-export async function getAdminAccess(userId: string): Promise<AdminAccess> {
-  const admin = createAdminClient();
-
-  const { data: adminRow } = await admin
+// user is allowed to do, using their own cookie-bound client — not a
+// service-role one. `admins` is readable by any admin already
+// (admins_select_admin), and operator_group_permissions has a
+// select-your-own-group policy (see
+// 20260822100000_operator_rls_without_service_role.sql) specifically so
+// this doesn't need elevated trust: it runs on every /admin/* page load,
+// so it must not depend on SUPABASE_SERVICE_ROLE_KEY being configured.
+export async function getAdminAccess(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<AdminAccess> {
+  const { data: adminRow } = await supabase
     .from("admins")
     .select("is_super_admin, group_id")
     .eq("user_id", userId)
@@ -44,7 +46,7 @@ export async function getAdminAccess(userId: string): Promise<AdminAccess> {
     return { isSuperAdmin: false, groupId: null, can: () => false };
   }
 
-  const { data: permissions } = await admin
+  const { data: permissions } = await supabase
     .from("operator_group_permissions")
     .select("menu, can_create, can_read, can_update, can_delete")
     .eq("group_id", adminRow.group_id);

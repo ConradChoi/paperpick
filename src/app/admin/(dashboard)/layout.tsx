@@ -7,8 +7,8 @@ export default async function AdminDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = await requireAdminPage();
-  const access = await getAdminAccess(user.id);
+  const { supabase, user } = await requireAdminPage();
+  const access = await getAdminAccess(supabase, user.id);
 
   const navItems: NavItem[] = [];
   if (access.can("products", "read")) {

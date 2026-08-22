@@ -1,6 +1,5 @@
 import { requireSuperAdminPage } from "@/lib/auth/require-admin-page";
 import { OperatorGroupsManager } from "@/components/admin/operator-groups-manager";
-import { createAdminClient } from "@/lib/supabase/admin";
 import type { OperatorGroup, OperatorGroupPermission } from "@/types/database";
 
 // Group create/update/delete all call router.refresh() and expect the very
@@ -8,10 +7,9 @@ import type { OperatorGroup, OperatorGroupPermission } from "@/types/database";
 export const dynamic = "force-dynamic";
 
 export default async function OperatorGroupsPage() {
-  await requireSuperAdminPage();
-  const admin = createAdminClient();
+  const { supabase } = await requireSuperAdminPage();
 
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from("operator_groups")
     .select("*, operator_group_permissions(*)")
     .order("created_at", { ascending: true });

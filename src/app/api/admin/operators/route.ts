@@ -7,10 +7,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
   try {
-    await requireSuperAdmin();
-    const admin = createAdminClient();
+    const { supabase } = await requireSuperAdmin();
 
-    const { data, error } = await admin
+    const { data, error } = await supabase
       .from("admins")
       .select("user_id, email, is_super_admin, group_id, created_at, operator_groups(name)")
       .order("created_at", { ascending: true });
@@ -31,6 +30,10 @@ const operatorSchema = z.object({
 export async function POST(request: Request) {
   try {
     await requireSuperAdmin();
+    // Service role is unavoidable here — auth.admin.createUser() has no
+    // RLS-governed equivalent. This is now the only reason
+    // SUPABASE_SERVICE_ROLE_KEY needs to be configured at all; everything
+    // else in the admin panel works without it (see admin-access.ts).
     const admin = createAdminClient();
     const body = await parseJsonBody(request);
     const parsed = operatorSchema.safeParse(body);
