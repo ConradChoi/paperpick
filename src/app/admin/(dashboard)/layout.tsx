@@ -1,6 +1,7 @@
 import { requireAdminPage } from "@/lib/auth/require-admin-page";
 import { getAdminAccess } from "@/lib/auth/admin-access";
 import { Sidebar, type NavItem } from "@/components/admin/sidebar";
+import { TopBar } from "@/components/admin/top-bar";
 
 export default async function AdminDashboardLayout({
   children,
@@ -24,10 +25,22 @@ export default async function AdminDashboardLayout({
     );
   }
 
+  let newInquiryCount: number | null = null;
+  if (access.can("inquiries", "read")) {
+    const { count } = await supabase
+      .from("inquiries")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "new");
+    newInquiryCount = count ?? 0;
+  }
+
   return (
     <div className="flex min-h-screen bg-surface-muted">
       <Sidebar navItems={navItems} />
-      <main className="flex-1 overflow-x-auto p-8">{children}</main>
+      <div className="flex flex-1 flex-col overflow-x-auto">
+        <TopBar newInquiryCount={newInquiryCount} />
+        <main className="flex-1 p-8">{children}</main>
+      </div>
     </div>
   );
 }

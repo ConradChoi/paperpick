@@ -1,21 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
 
 export type NavItem = { href: string; label: string };
 
 export function Sidebar({ navItems }: { navItems: NavItem[] }) {
   const pathname = usePathname();
-  const router = useRouter();
-
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
-  }
 
   return (
     <aside className="flex h-screen w-60 shrink-0 flex-col gap-1 border-r border-line bg-surface p-4">
@@ -36,12 +27,6 @@ export function Sidebar({ navItems }: { navItems: NavItem[] }) {
           </Link>
         );
       })}
-      <button
-        onClick={handleLogout}
-        className="mt-auto rounded-md px-4 py-3 text-left text-sm font-medium text-ink-muted hover:bg-surface-muted"
-      >
-        로그아웃
-      </button>
     </aside>
   );
 }
