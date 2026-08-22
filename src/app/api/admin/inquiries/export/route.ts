@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     // that got cut off.
     let query = supabase
       .from("inquiries")
-      .select("*, products(name_ko, name_en)")
+      .select("*, products(brand_ko, name_ko, name_en)")
       .order("created_at", { ascending: false })
       .limit(MAX_ROWS + 1);
 
@@ -88,13 +88,13 @@ export async function POST(request: Request) {
 
     for (const row of exportedRows) {
       const product = row.products as
-        | { name_ko: string; name_en: string | null }
+        | { brand_ko: string; name_ko: string; name_en: string | null }
         | null;
       rows.push([
         TYPE_LABEL[row.type] ?? row.type,
         row.name,
         row.contact,
-        product ? product.name_ko : "",
+        product ? `${product.brand_ko} · ${product.name_ko}` : "",
         row.message ?? "",
         row.locale,
         STATUS_LABEL[row.status] ?? row.status,

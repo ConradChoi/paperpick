@@ -41,7 +41,7 @@ export default async function AdminInquiriesPage({
 
   let query = supabase
     .from("inquiries")
-    .select("*, products(name_ko)", { count: "exact" })
+    .select("*, products(brand_ko, name_ko)", { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (status) query = query.eq("status", status);
@@ -87,7 +87,9 @@ export default async function AdminInquiriesPage({
               </tr>
             )}
             {inquiries.map((row) => {
-              const product = row.products as { name_ko: string } | null;
+              const product = row.products as
+                | { brand_ko: string; name_ko: string }
+                | null;
               return (
                 <tr key={row.id} className="border-t border-line">
                   <td className="px-4 py-3">
@@ -98,7 +100,7 @@ export default async function AdminInquiriesPage({
                   <td className="px-4 py-3 font-medium text-ink">{row.name}</td>
                   <td className="px-4 py-3 text-ink-muted">{row.contact}</td>
                   <td className="px-4 py-3 text-ink-muted">
-                    {product?.name_ko ?? "—"}
+                    {product ? `${product.brand_ko} · ${product.name_ko}` : "—"}
                   </td>
                   <td className="px-4 py-3">
                     {canUpdate ? (

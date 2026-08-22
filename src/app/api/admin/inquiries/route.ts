@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
     let query = supabase
       .from("inquiries")
-      .select("*, products(name_ko, name_en)", { count: "exact" })
+      .select("*, products(brand_ko, name_ko, name_en)", { count: "exact" })
       .order("created_at", { ascending: false });
 
     if (status) query = query.eq("status", status);
@@ -34,13 +34,15 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     const items = (data ?? []).map((row) => {
-      const product = row.products as { name_ko: string; name_en: string | null } | null;
+      const product = row.products as
+        | { brand_ko: string; name_ko: string; name_en: string | null }
+        | null;
       return {
         id: row.id,
         type: row.type,
         name: row.name,
         contact: row.contact,
-        product: product ? product.name_ko : null,
+        product: product ? `${product.brand_ko} · ${product.name_ko}` : null,
         status: row.status,
         createdAt: row.created_at,
       };
