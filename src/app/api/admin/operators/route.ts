@@ -11,7 +11,9 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("admins")
-      .select("user_id, email, is_super_admin, group_id, created_at, operator_groups(name)")
+      .select(
+        "user_id, email, is_super_admin, group_id, status, created_at, operator_groups(name)",
+      )
       .order("created_at", { ascending: true });
     if (error) throw error;
 
@@ -67,6 +69,7 @@ export async function POST(request: Request) {
         email,
         is_super_admin: false,
         group_id: groupId ?? null,
+        status: "approved",
       })
       .select()
       .single();

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
@@ -21,13 +22,46 @@ export default function AdminLoginPage() {
     const password = String(form.get("password") ?? "");
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: signInData, error: signInError } =
+      await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
       setError("아이디 또는 비밀번호가 올바르지 않습니다");
+      setSubmitting(false);
+      return;
+    }
+
+    // A confirmed-but-not-yet-approved signup (see /admin/signup) has no
+    // admins row until their first successful login — this is where it
+    // gets created, since that's the first point auth.uid() is available.
+    const { data: adminRow } = await supabase
+      .from("admins")
+      .select("status")
+      .eq("user_id", signInData.user.id)
+      .maybeSingle();
+
+    if (!adminRow) {
+      await supabase
+        .from("admins")
+        .insert({ user_id: signInData.user.id, email, status: "pending" });
+      setError(
+        "가입 요청이 접수됐습니다. 최고관리자 승인 후 로그인해주세요.",
+      );
+      await supabase.auth.signOut();
+      setSubmitting(false);
+      return;
+    }
+
+    if (adminRow.status === "pending") {
+      setError("가입 요청이 아직 승인 대기 중입니다.");
+      await supabase.auth.signOut();
+      setSubmitting(false);
+      return;
+    }
+
+    if (adminRow.status === "rejected") {
+      setError("가입 요청이 거절됐습니다. 최고관리자에게 문의해주세요.");
+      await supabase.auth.signOut();
       setSubmitting(false);
       return;
     }
@@ -69,6 +103,13 @@ export default function AdminLoginPage() {
         <Button type="submit" size="lg" disabled={submitting}>
           로그인
         </Button>
+
+        <Link
+          href="/admin/signup"
+          className="text-center text-[13px] text-ink-muted hover:text-ink"
+        >
+          운영자 가입 요청
+        </Link>
       </form>
     </div>
   );

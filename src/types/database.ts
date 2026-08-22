@@ -24,12 +24,14 @@ export type Product = {
 
 export type AdminMenu = "products" | "inquiries";
 export type PermissionAction = "create" | "read" | "update" | "delete";
+export type AdminStatus = "pending" | "approved" | "rejected";
 
 export type AdminRow = {
   user_id: string;
   email: string | null;
   is_super_admin: boolean;
   group_id: string | null;
+  status: AdminStatus;
   created_at: string;
 };
 

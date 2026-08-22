@@ -2,8 +2,9 @@ import { requireSuperAdminPage } from "@/lib/auth/require-admin-page";
 import { ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OperatorGroupSelect } from "@/components/admin/operator-group-select";
+import { OperatorApproval } from "@/components/admin/operator-approval";
 import { DeleteOperatorButton } from "@/components/admin/delete-operator-button";
-import type { OperatorGroup } from "@/types/database";
+import type { AdminStatus, OperatorGroup } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +13,20 @@ type OperatorRow = {
   email: string | null;
   is_super_admin: boolean;
   group_id: string | null;
+  status: AdminStatus;
   created_at: string;
   operator_groups: { name: string } | null;
+};
+
+const STATUS_BADGE: Record<AdminStatus, "warning" | "success" | "error"> = {
+  pending: "warning",
+  approved: "success",
+  rejected: "error",
+};
+const STATUS_LABEL: Record<AdminStatus, string> = {
+  pending: "승인 대기",
+  approved: "승인됨",
+  rejected: "거절됨",
 };
 
 export default async function OperatorsPage() {
@@ -22,7 +35,9 @@ export default async function OperatorsPage() {
   const [operatorsResult, groupsResult] = await Promise.all([
     admin
       .from("admins")
-      .select("user_id, email, is_super_admin, group_id, created_at, operator_groups(name)")
+      .select(
+        "user_id, email, is_super_admin, group_id, status, created_at, operator_groups(name)",
+      )
       .order("created_at", { ascending: true }),
     admin.from("operator_groups").select("*").order("name", { ascending: true }),
   ]);
@@ -39,6 +54,10 @@ export default async function OperatorsPage() {
         <h1 className="text-2xl font-bold text-ink">운영자 관리</h1>
         <ButtonLink href="/admin/operators/new">+ 운영자 등록</ButtonLink>
       </div>
+      <p className="text-sm text-ink-muted">
+        직접 등록하거나, <code>/admin/signup</code>에서 가입 요청을 받아
+        여기서 그룹을 지정해 승인할 수 있습니다.
+      </p>
 
       <div className="overflow-hidden rounded-lg border border-line bg-surface">
         <table className="w-full text-left text-sm">
@@ -46,6 +65,7 @@ export default async function OperatorsPage() {
             <tr>
               <th className="px-4 py-3 font-medium">이메일</th>
               <th className="px-4 py-3 font-medium">구분</th>
+              <th className="px-4 py-3 font-medium">상태</th>
               <th className="px-4 py-3 font-medium">그룹</th>
               <th className="px-4 py-3 font-medium">등록일</th>
               <th className="px-4 py-3 font-medium">액션</th>
@@ -64,7 +84,18 @@ export default async function OperatorsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {op.is_super_admin ? (
+                    <span className="text-ink-muted">—</span>
+                  ) : (
+                    <Badge style={STATUS_BADGE[op.status]}>
+                      {STATUS_LABEL[op.status]}
+                    </Badge>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  {op.is_super_admin ? (
                     <span className="text-ink-muted">전체 권한</span>
+                  ) : op.status === "pending" ? (
+                    <OperatorApproval userId={op.user_id} groups={groups} />
                   ) : (
                     <OperatorGroupSelect
                       userId={op.user_id}

@@ -6,7 +6,8 @@ import { parseJsonBody } from "@/lib/api/parse-body";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const operatorUpdateSchema = z.object({
-  groupId: z.string().uuid().nullable(),
+  groupId: z.string().uuid().nullable().optional(),
+  status: z.enum(["pending", "approved", "rejected"]).optional(),
 });
 
 export async function PATCH(
@@ -19,7 +20,11 @@ export async function PATCH(
     const body = await parseJsonBody(request);
     const parsed = operatorUpdateSchema.safeParse(body);
     if (!parsed.success) {
-      throw new ApiError(400, "VALIDATION_ERROR", "groupId 값을 확인해주세요");
+      throw new ApiError(400, "VALIDATION_ERROR", "입력값을 확인해주세요");
+    }
+    const { groupId, status } = parsed.data;
+    if (groupId === undefined && status === undefined) {
+      throw new ApiError(400, "VALIDATION_ERROR", "변경할 값이 없습니다");
     }
 
     const { data: target } = await admin
@@ -34,13 +39,17 @@ export async function PATCH(
       throw new ApiError(
         403,
         "FORBIDDEN",
-        "최고관리자 계정은 그룹을 변경할 수 없습니다",
+        "최고관리자 계정은 변경할 수 없습니다",
       );
     }
 
+    const update: Record<string, unknown> = {};
+    if (groupId !== undefined) update.group_id = groupId;
+    if (status !== undefined) update.status = status;
+
     const { data, error } = await admin
       .from("admins")
-      .update({ group_id: parsed.data.groupId })
+      .update(update)
       .eq("user_id", id)
       .select()
       .maybeSingle();
