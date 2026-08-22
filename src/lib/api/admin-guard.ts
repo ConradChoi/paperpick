@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { ApiError } from "@/lib/api/error";
+import { getAdminAccess } from "@/lib/auth/admin-access";
+import type { AdminMenu, PermissionAction } from "@/types/database";
 
 // Verifies the caller has an active session AND passes `is_admin()`. RLS
 // still enforces this independently on every query — this check exists so
@@ -26,6 +28,40 @@ export async function requireAdmin() {
 
   if (error || !isAdmin) {
     throw new ApiError(403, "FORBIDDEN", "관리자 권한이 없습니다");
+  }
+
+  return { supabase, user };
+}
+
+// Fine-grained version of requireAdmin() — an operator (non-super-admin)
+// additionally needs their group to grant the given action on the given
+// menu. `actions` accepts an array to mean "any of these" (e.g. image
+// upload is used from both the new-product and edit-product forms, so it
+// only requires create OR update, not specifically one of them).
+export async function requireAdminPermission(
+  menu: AdminMenu,
+  actions: PermissionAction | PermissionAction[],
+) {
+  const { supabase, user } = await requireAdmin();
+  const access = await getAdminAccess(user.id);
+
+  const required = Array.isArray(actions) ? actions : [actions];
+  if (!required.some((action) => access.can(menu, action))) {
+    throw new ApiError(403, "FORBIDDEN", "이 작업에 대한 권한이 없습니다");
+  }
+
+  return { supabase, user, access };
+}
+
+// Operator group / operator account management is exclusively a super
+// admin capability — never delegable via group permissions, since that
+// would let an operator grant themselves more access.
+export async function requireSuperAdmin() {
+  const { supabase, user } = await requireAdmin();
+  const access = await getAdminAccess(user.id);
+
+  if (!access.isSuperAdmin) {
+    throw new ApiError(403, "FORBIDDEN", "최고관리자만 사용할 수 있습니다");
   }
 
   return { supabase, user };

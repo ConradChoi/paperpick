@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
 import { isProductImageUrl, sanitizeProductDescription } from "@/lib/sanitize";
@@ -9,7 +9,7 @@ const PAGE_SIZE = 20;
 
 export async function GET(request: Request) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", "read");
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
 
@@ -62,7 +62,7 @@ const productSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", "create");
     const body = await parseJsonBody(request);
     const parsed = productSchema.safeParse(body);
     if (!parsed.success) {

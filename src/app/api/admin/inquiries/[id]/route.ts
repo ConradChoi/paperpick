@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
 
@@ -13,7 +13,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/inquiries/[id]">,
 ) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("inquiries", "update");
     const { id } = await ctx.params;
     const body = await parseJsonBody(request);
     const parsed = statusSchema.safeParse(body);

@@ -1,9 +1,9 @@
-import { requireAdminPage } from "@/lib/auth/require-admin-page";
+import { requireMenuAccess } from "@/lib/auth/require-admin-page";
 import { Badge } from "@/components/ui/badge";
 import { InquiryFilters } from "@/components/admin/inquiry-filters";
 import { InquiryStatusSelect } from "@/components/admin/inquiry-status-select";
 import { ExportButton } from "@/components/admin/export-button";
-import type { InquiryType } from "@/types/database";
+import type { InquiryStatus, InquiryType } from "@/types/database";
 
 // Admin operational data must never be served stale — a status change via
 // InquiryStatusSelect calls router.refresh() and expects the very next
@@ -21,12 +21,18 @@ const TYPE_BADGE: Record<InquiryType, "neutral" | "info" | "success"> = {
   reservation: "info",
   newsletter: "neutral",
 };
+const STATUS_LABEL: Record<InquiryStatus, string> = {
+  new: "신규",
+  in_progress: "처리중",
+  done: "완료",
+};
 const PAGE_SIZE = 20;
 
 export default async function AdminInquiriesPage({
   searchParams,
 }: PageProps<"/admin/inquiries">) {
-  const { supabase } = await requireAdminPage();
+  const { supabase, access } = await requireMenuAccess("inquiries");
+  const canUpdate = access.can("inquiries", "update");
   const sp = await searchParams;
   const status = typeof sp.status === "string" ? sp.status : null;
   const type = typeof sp.type === "string" ? sp.type : null;
@@ -95,7 +101,13 @@ export default async function AdminInquiriesPage({
                     {product?.name_ko ?? "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <InquiryStatusSelect id={row.id} status={row.status} />
+                    {canUpdate ? (
+                      <InquiryStatusSelect id={row.id} status={row.status} />
+                    ) : (
+                      <Badge style="neutral">
+                        {STATUS_LABEL[row.status as InquiryStatus]}
+                      </Badge>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-ink-muted">
                     {new Date(row.created_at).toLocaleDateString("ko-KR")}

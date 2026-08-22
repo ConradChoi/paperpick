@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { errorResponse } from "@/lib/api/error";
 import { sanitizeSearchTerm } from "@/lib/api/search";
 
@@ -7,7 +7,7 @@ const PAGE_SIZE = 20;
 
 export async function GET(request: Request) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("inquiries", "read");
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const type = searchParams.get("type");

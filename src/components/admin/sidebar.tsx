@@ -4,12 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-const NAV_ITEMS = [
-  { href: "/admin/products", label: "상품 관리" },
-  { href: "/admin/inquiries", label: "리드 관리" },
-];
+export type NavItem = { href: string; label: string };
 
-export function Sidebar() {
+export function Sidebar({ navItems }: { navItems: NavItem[] }) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,7 +22,7 @@ export function Sidebar() {
       <div className="mb-4 px-2 text-lg font-bold text-ink">
         Paper Pick Admin
       </div>
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const active = pathname.startsWith(item.href);
         return (
           <Link

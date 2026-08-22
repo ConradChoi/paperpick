@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 
 // Generic image upload used by the product form (representative + up to 4
@@ -26,7 +26,10 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", [
+      "create",
+      "update",
+    ]);
 
     let form: FormData;
     try {

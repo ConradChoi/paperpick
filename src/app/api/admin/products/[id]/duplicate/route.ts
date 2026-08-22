@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import type { Product } from "@/types/database";
 
@@ -14,7 +14,7 @@ export async function POST(
   ctx: RouteContext<"/api/admin/products/[id]/duplicate">,
 ) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", "create");
     const { id } = await ctx.params;
 
     const { data: source, error: sourceError } = await supabase

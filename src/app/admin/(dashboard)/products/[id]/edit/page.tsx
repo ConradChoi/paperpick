@@ -1,12 +1,13 @@
-import { notFound } from "next/navigation";
-import { requireAdminPage } from "@/lib/auth/require-admin-page";
+import { notFound, redirect } from "next/navigation";
+import { requireMenuAccess } from "@/lib/auth/require-admin-page";
 import { ProductForm, type SelectableProduct } from "@/components/admin/product-form";
 import type { Product } from "@/types/database";
 
 export default async function EditProductPage({
   params,
 }: PageProps<"/admin/products/[id]/edit">) {
-  const { supabase } = await requireAdminPage();
+  const { supabase, access } = await requireMenuAccess("products");
+  if (!access.can("products", "update")) redirect("/admin/products");
   const { id } = await params;
 
   const [productResult, availableProductsResult, selectedResult] = await Promise.all([

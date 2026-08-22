@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireAdminPage } from "@/lib/auth/require-admin-page";
+import { requireMenuAccess } from "@/lib/auth/require-admin-page";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
@@ -12,7 +12,7 @@ import type { Product } from "@/types/database";
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
-  const { supabase } = await requireAdminPage();
+  const { supabase, access } = await requireMenuAccess("products");
 
   const { data, error } = await supabase
     .from("products")
@@ -22,11 +22,15 @@ export default async function AdminProductsPage() {
   if (error) throw error;
   const products = (data ?? []) as Product[];
 
+  const canCreate = access.can("products", "create");
+  const canUpdate = access.can("products", "update");
+  const canDelete = access.can("products", "delete");
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-ink">상품 관리</h1>
-        <ButtonLink href="/admin/products/new">+ 상품 등록</ButtonLink>
+        {canCreate && <ButtonLink href="/admin/products/new">+ 상품 등록</ButtonLink>}
       </div>
 
       <div className="overflow-hidden rounded-lg border border-line bg-surface">
@@ -38,7 +42,9 @@ export default async function AdminProductsPage() {
               <th className="px-4 py-3 font-medium">규격</th>
               <th className="px-4 py-3 font-medium">가격</th>
               <th className="px-4 py-3 font-medium">상태</th>
-              <th className="px-4 py-3 font-medium">액션</th>
+              {(canUpdate || canCreate || canDelete) && (
+                <th className="px-4 py-3 font-medium">액션</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -67,18 +73,24 @@ export default async function AdminProductsPage() {
                     {p.status === "active" ? "판매중" : "품절"}
                   </Badge>
                 </td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/admin/products/${p.id}/edit`}
-                      className="text-brand hover:underline"
-                    >
-                      수정
-                    </Link>
-                    <DuplicateProductButton id={p.id} />
-                    <DeleteProductButton id={p.id} name={p.name_ko} />
-                  </div>
-                </td>
+                {(canUpdate || canCreate || canDelete) && (
+                  <td className="px-4 py-3">
+                    <div className="flex gap-3">
+                      {canUpdate && (
+                        <Link
+                          href={`/admin/products/${p.id}/edit`}
+                          className="text-brand hover:underline"
+                        >
+                          수정
+                        </Link>
+                      )}
+                      {canCreate && <DuplicateProductButton id={p.id} />}
+                      {canDelete && (
+                        <DeleteProductButton id={p.id} name={p.name_ko} />
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

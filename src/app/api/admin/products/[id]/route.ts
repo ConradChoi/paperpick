@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
 import { isProductImageUrl, sanitizeProductDescription } from "@/lib/sanitize";
@@ -68,7 +68,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/admin/products/[id]">,
 ) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", "update");
     const { id } = await ctx.params;
     const body = await parseJsonBody(request);
     const parsed = productUpdateSchema.safeParse(body);
@@ -155,7 +155,7 @@ export async function DELETE(
   ctx: RouteContext<"/api/admin/products/[id]">,
 ) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("products", "delete");
     const { id } = await ctx.params;
 
     const { data, error } = await supabase

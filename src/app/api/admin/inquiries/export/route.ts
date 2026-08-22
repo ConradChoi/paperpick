@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import XlsxPopulate from "xlsx-populate";
-import { requireAdmin } from "@/lib/api/admin-guard";
+import { requireAdminPermission } from "@/lib/api/admin-guard";
 import { ApiError, errorResponse } from "@/lib/api/error";
 import { parseJsonBody } from "@/lib/api/parse-body";
 import { sanitizeSearchTerm } from "@/lib/api/search";
@@ -32,7 +32,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
-    const { supabase } = await requireAdmin();
+    const { supabase } = await requireAdminPermission("inquiries", "read");
     const body = await parseJsonBody(request);
     const parsed = exportSchema.safeParse(body);
     if (!parsed.success) {

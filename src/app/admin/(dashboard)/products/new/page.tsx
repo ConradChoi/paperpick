@@ -1,8 +1,10 @@
-import { requireAdminPage } from "@/lib/auth/require-admin-page";
+import { redirect } from "next/navigation";
+import { requireMenuAccess } from "@/lib/auth/require-admin-page";
 import { ProductForm, type SelectableProduct } from "@/components/admin/product-form";
 
 export default async function NewProductPage() {
-  const { supabase } = await requireAdminPage();
+  const { supabase, access } = await requireMenuAccess("products");
+  if (!access.can("products", "create")) redirect("/admin/products");
 
   const { data, error } = await supabase
     .from("products")

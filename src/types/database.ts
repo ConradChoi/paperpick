@@ -22,6 +22,32 @@ export type Product = {
   updated_at: string;
 };
 
+export type AdminMenu = "products" | "inquiries";
+export type PermissionAction = "create" | "read" | "update" | "delete";
+
+export type AdminRow = {
+  user_id: string;
+  email: string | null;
+  is_super_admin: boolean;
+  group_id: string | null;
+  created_at: string;
+};
+
+export type OperatorGroup = {
+  id: string;
+  name: string;
+  created_at: string;
+};
+
+export type OperatorGroupPermission = {
+  group_id: string;
+  menu: AdminMenu;
+  can_create: boolean;
+  can_read: boolean;
+  can_update: boolean;
+  can_delete: boolean;
+};
+
 export type InquiryType = "general" | "reservation" | "newsletter";
 export type InquiryStatus = "new" | "in_progress" | "done";
 export type Locale = "ko" | "en";
